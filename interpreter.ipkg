@@ -11,4 +11,7 @@ brief = "An example well-typed interpreter using Idris2 based on the crash cours
 modules = Main, Interpreter
 
 sourcedir = "src"
+
 main = Main
+
+executable = Main
