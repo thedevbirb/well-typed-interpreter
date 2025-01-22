@@ -1,0 +1,14 @@
+package interpreter
+
+version = 0.0.1
+
+authors = "thedevbirb"
+
+readme = "README.md"
+
+brief = "An example well-typed interpreter using Idris2 based on the crash course, for learning purposes"
+
+modules = Main, Interpreter
+
+sourcedir = "src"
+main = Main
