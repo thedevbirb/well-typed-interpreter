@@ -30,6 +30,7 @@ interpretType BirbInt = Int
 interpretType BirbBool = Bool
 interpretType (BirbFun a b) = interpretType a -> interpretType b
 
+-- NOTE: this mutual block isn't necessary but helps with clarity
 mutual
   ||| Represents an expression in the Birb language.
   |||
@@ -41,9 +42,10 @@ mutual
   ||| - It takes a [Context], representing the variables available in scope.
   ||| - It takes a `BirbType`, representing the type of the expression itself.
   ||| - It returns an Idris2 type, ensuring type safety at the language level.
-  data Expr : Context -> BirbType -> Type
+  data Expression : Context n -> BirbType -> Type
 
-  ||| A [Context] represents a vector of the types of variables currently
-  ||| available in scope. The length of the vector corresponds to the number
-  ||| of variables in scope.
-  data Context = Vect n BirbType
+  ||| A [Context] is a type alias that represents a vector of the types of
+  ||| variables currently available in scope. The length of the vector
+  ||| corresponds to the number of variables in scope.
+  Context : Nat -> Type
+  Context n = Vect n BirbType
