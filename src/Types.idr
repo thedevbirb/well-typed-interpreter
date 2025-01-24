@@ -47,6 +47,12 @@ mutual
   ||| A [Context] is a type alias that represents a vector of the types of
   ||| variables currently available in scope. The length of the vector
   ||| corresponds to the number of variables in scope.
+  |||
+  ||| Variables have a nameless representation, and they're "de Bruijn" 0-indexed
+  ||| (reference: https://en.wikipedia.org/wiki/De_Bruijn_index).
+  ||| An index indicates the number of lambdas between definition and use.
+  ||| For example, in the expression `\x. \y. x y` the variable `x` has index 1
+  ||| while `y` has 0.
   Context : Nat -> Type
   Context n = Vect n BirbType
 
@@ -69,8 +75,9 @@ mutual
     ||| -- proof2 = First
     ||| ```
     First : HasType FZ (t :: context) t
-    ||| [Next] takes a proof that the `k`-th variable in the `context` has type `t`,
-    ||| and outputs a proof that, if there is another type `u` in
+    ||| [Next] return a proof that the `k+1`-th variable in the context has type `t`
+    ||| if you provide a proof that, in a shorter context with one less element,
+    ||| the `k`-th variable has type `t`.
     |||
     ||| Example:
     ||| ```idris2
