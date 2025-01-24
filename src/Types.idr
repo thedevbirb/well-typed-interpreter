@@ -32,6 +32,21 @@ interpretType (BirbFun a b) = interpretType a -> interpretType b
 
 -- NOTE: this mutual block isn't necessary but helps with clarity
 mutual
+  ||| A [Context] is a type alias that represents a vector of the types of
+  ||| variables currently available in scope. The length of the vector
+  ||| corresponds to the number of variables in scope.
+  |||
+  ||| Note that in this language only lambda expressions can introduce
+  ||| new variable in scope.
+  |||
+  ||| Variables have a nameless representation, and they're "de Bruijn" 0-indexed
+  ||| (reference: https://en.wikipedia.org/wiki/De_Bruijn_index).
+  ||| An index indicates the number of lambdas between definition and use.
+  ||| For example, in the expression `\x. \y. x y` the variable `x` has index 1
+  ||| while `y` has 0.
+  Context : Nat -> Type
+  Context n = Vect n BirbType
+
   ||| Represents an expression in the Birb language.
   |||
   ||| Each expression is well-typed, ensuring that only valid programs can
@@ -42,19 +57,23 @@ mutual
   ||| - It takes a [Context], representing the variables available in scope.
   ||| - It takes a `BirbType`, representing the type of the expression itself.
   ||| - It returns an Idris2 type, ensuring type safety at the language level.
-  data Expression : Context n -> BirbType -> Type
+  data Expression : Context n -> BirbType -> Type where
+    ||| A [Value] takes an Idris2 integer and returns an expression
+    ||| that evaluates to a [BirbInt].
+    Value : Integer -> Expression context BirbInt
+    ||| A [Variable] takes a proof that a certain variable in the context
+    ||| has type `t` and returns an expression that evalues to a `t`.
+    |||
+    ||| Example:
+    ||| ```idris2
+    ||| proof_of_type : HasType (FS FZ) [BirbInt, BirbBool] BirbBool
+    ||| proof_of_type = Next First
+    |||
+    ||| var : Expression [BirbInt, BirbBool] BirbBool
+    ||| var = Variable proof_of_type
+    ||| ```
+    Variable : HasType i context t -> Expression context t
 
-  ||| A [Context] is a type alias that represents a vector of the types of
-  ||| variables currently available in scope. The length of the vector
-  ||| corresponds to the number of variables in scope.
-  |||
-  ||| Variables have a nameless representation, and they're "de Bruijn" 0-indexed
-  ||| (reference: https://en.wikipedia.org/wiki/De_Bruijn_index).
-  ||| An index indicates the number of lambdas between definition and use.
-  ||| For example, in the expression `\x. \y. x y` the variable `x` has index 1
-  ||| while `y` has 0.
-  Context : Nat -> Type
-  Context n = Vect n BirbType
 
   ||| [HasType] is a data type that encodes evidence (or proof) that
   ||| the `i`-th variable in the context is of the provided `BirbType`.
