@@ -49,3 +49,38 @@ mutual
   ||| corresponds to the number of variables in scope.
   Context : Nat -> Type
   Context n = Vect n BirbType
+
+  ||| [HasType] is a data type that encodes evidence (or proof) that
+  ||| the `i`-th variable in the context is of the provided `BirbType`.
+  data HasType : Fin n -> Context n -> BirbType -> Type where
+    ||| [First] proves that the first variable at index `FZ` (the zeroth index)
+    ||| in the context has the provided type `t`.
+    ||| The constructor is essentially a pattern much of the structure of the type.
+    |||
+    ||| Example:
+    ||| ```idris2
+    ||| -- Correct usage: The zeroth variable has type `BirbInt`, which matches the proof.
+    ||| proof1 : HasType FZ [BirbInt, BirbBool] BirbInt
+    ||| proof1 = First
+    ||| 
+    ||| -- Incorrect usage: The type `BirbFun` doesn't match the first element `BirbInt`,
+    ||| -- so this would result in a compile-time error.
+    ||| -- proof2 : HasType FZ [BirbInt, BirbBool] BirbFun
+    ||| -- proof2 = First
+    ||| ```
+    First : HasType FZ (t :: context) t
+    ||| [Next] takes a proof that the `k`-th variable in the `context` has type `t`,
+    ||| and outputs a proof that, if there is another type `u` in
+    |||
+    ||| Example:
+    ||| ```idris2
+    ||| -- The context `[BirbInt, BirbBool]` implies two things:
+    ||| -- 1. Since its length is 2, it must be `(FS k) == FS FZ` so `k == FZ`.
+    ||| -- 2. Since it must match `(u :: context)`, it means that `context == [BirbBool]`
+    ||| -- As such `Next` needs as argument a `HasType FZ [BirbBool] BirbBool` which
+    ||| -- `First` is able to create.
+    ||| proof2 : HasType (FS FZ) [BirbInt, BirbBool] BirbBool
+    ||| proof2 = Next First
+    ||| ```
+    Next : HasType k context t -> HasType (FS k) (u :: context) t
+
