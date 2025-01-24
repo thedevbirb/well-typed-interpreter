@@ -73,6 +73,19 @@ mutual
     ||| var = Variable proof_of_type
     ||| ```
     Variable : HasType i context t -> Expression context t
+    ||| A [Lambda] is an expression that evalues to a function `Birb x t`.
+    ||| The input corresponds to the body of the function, which is an expression
+    ||| with a variable `x` in scope, added to the context, and that evalues to a type `t`.
+    |||
+    ||| It abstracts a construction like `\x -> ...)`.
+    |||
+    ||| Example:
+    ||| ```idris2
+    ||| -- A lambda function that takes a parameter of type `BirbInt` but always returns 0
+    ||| lambda : Expression [] (BirbFun BirbInt BirbBool)
+    ||| lambda = Lambda (Value 0)
+    ||| ```
+    Lambda : Expression (x :: context) t -> Expression context (BirbFun x t)
 
 
   ||| [HasType] is a data type that encodes evidence (or proof) that
@@ -109,4 +122,3 @@ mutual
     ||| proof2 = Next First
     ||| ```
     Next : HasType k context t -> HasType (FS k) (u :: context) t
-
