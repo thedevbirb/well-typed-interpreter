@@ -86,6 +86,39 @@ mutual
     ||| lambda = Lambda (Value 0)
     ||| ```
     Lambda : Expression (x :: context) t -> Expression context (BirbFun x t)
+    ||| [App] represents a function application.
+    |||
+    ||| Example:
+    ||| ```idris2
+    ||| -- Represents the application of a lambda that always returns zero evaluated at `5`.
+    ||| app : Expression [] BirbInt
+    ||| app = App (Lambda (Value 0)) (Value 5)
+    ||| ```
+    App : Expression context (BirbFun x t) -> Expression context x -> Expression context t
+    ||| [Op] allows arbitrary binary operators from Idris types resulting from an interpretation of
+    ||| [BirbType]s and returns a corresponding expression
+    |||
+    ||| Example:
+    ||| ```idris2
+    ||| equal : Expression [] BirbInt -> Expression [] BirbInt -> Expression [] BirbBool
+    ||| equal = Op (==)
+    Op: (interpretType a -> interpretType b -> interpretType c) ->
+        (Expression context a -> Expression context b -> Expression context c)
+    ||| [If] represents an "if" condition, where the branches are lazily evaluated
+    ||| as an optimization.
+    |||
+    ||| Example:
+    ||| ```idris2
+    ||| true_var : Expression [BirbBool] BirbBool
+    ||| true_var = Variable First
+    ||| 
+    ||| if_example : Expression [BirbBool] BirbInt
+    ||| if_example = If true_var (Value 1) (Value 0)
+    ||| ```
+    If: Expression context BirbBool
+        -> Lazy (Expression context t)
+        -> Lazy (Expression context t)
+        -> Expression context t
 
 
   ||| [HasType] is a data type that encodes evidence (or proof) that
@@ -100,7 +133,7 @@ mutual
     ||| -- Correct usage: The zeroth variable has type `BirbInt`, which matches the proof.
     ||| proof1 : HasType FZ [BirbInt, BirbBool] BirbInt
     ||| proof1 = First
-    ||| 
+    |||
     ||| -- Incorrect usage: The type `BirbFun` doesn't match the first element `BirbInt`,
     ||| -- so this would result in a compile-time error.
     ||| -- proof2 : HasType FZ [BirbInt, BirbBool] BirbFun
