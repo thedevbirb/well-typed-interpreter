@@ -8,7 +8,7 @@ readme = "README.md"
 
 brief = "An example well-typed interpreter using Idris2 based on the crash course, for learning purposes"
 
-modules = Main, Interpreter
+modules = Main, Interpreter, Examples
 
 sourcedir = "src"
 

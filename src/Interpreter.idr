@@ -1,11 +1,12 @@
 module Interpreter
 
-import Types
-import Data.Vect
+import public Types
+import public Data.Vect
 
 ||| [Environment] is a type indexed by [Context], meaning that it carries
 ||| information of the types of the variables in scope, that can be created
 ||| by runtime Idris values by interpreting their type.
+public export
 data Environment : Context n -> Type where
   Nil : Environment Nil
   ||| Extends the environment with a runtime value of the type
@@ -46,6 +47,7 @@ lookup (Next k) (x :: env_context) = lookup k env_context
 
 ||| An interpreter takes an environment with its context, an expression of type `t`
 ||| in BirbLang and returns its value of idris type `interpretType t`
+public export
 interpret : Environment context -> Expression context t -> interpretType t
 -- Given the environment, a variable consists of a proof that a certain value
 -- belongs to the context. As such, we look it up in the environment.
