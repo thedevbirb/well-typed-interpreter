@@ -26,7 +26,7 @@ data BirbType : Type where
 |||    the input has type `a` and the output has type `b`.
 public export
 interpretType : BirbType -> Type
-interpretType BirbInt = Int
+interpretType BirbInt = Integer
 interpretType BirbBool = Bool
 interpretType (BirbFun a b) = interpretType a -> interpretType b
 
