@@ -43,3 +43,33 @@ lookup : HasType i context t -> Environment context -> interpretType t
 lookup First (x :: env_context) = x
 -- Recursive definition that relies of `First` as a base case.
 lookup (Next k) (x :: env_context) = lookup k env_context
+
+||| An interpreter takes an environment with its context, an expression of type `t`
+||| in BirbLang and returns its value of idris type `interpretType t`
+interpret : Environment context -> Expression context t -> interpretType t
+-- Given the environment, a variable consists of a proof that a certain value
+-- belongs to the context. As such, we look it up in the environment.
+interpret env (Variable x) = lookup x env 
+-- An `Integer` is simply returned
+interpret env (Value x) = x
+-- Since a `Lambda` is created with an expression that adds a new `x` in scope 
+-- and that evalues to `t`, its interpretation is an Idris closure
+-- where we interpret its scope expression and add the parameter to the environment.
+-- Example:
+-- ```idris2
+-- result : Int
+-- -- intrepted as \x => interpret (x :: Nil) (Value 0)
+-- result = interpret Nil (Lambda Value 0)
+-- ```
+interpret env (Lambda expr) = \x => interpret (x :: env) expr
+-- The intepretation of a function application is the applying
+-- the interpreted argument to the interpreted function.
+interpret env (App f x) = interpret env f (interpret env x)
+-- Note that `op` here is already an Idris operator, so the interpretation
+-- is the application of the operator to its interpreted arguments.
+interpret env (Op op x y) = op (interpret env x) (interpret env y)
+-- For the `If` case is a straightforward interpretation of the underlying expressions
+interpret env (If expr_bool expr_then expr_else) =
+  if (interpret env expr_bool)
+    then (interpret env expr_then)
+    else (interpret env expr_else)
