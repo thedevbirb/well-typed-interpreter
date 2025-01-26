@@ -9,7 +9,7 @@ import Data.Vect
 ||| - `BirbBool` represents boolean types.
 ||| - `BirbFun` represents a function type, where the first `BirbType` is the
 |||    input type, and the second `BirbType` is the output type.
-export
+public export
 data BirbType : Type where
   BirbInt : BirbType
   BirbBool : BirbType
@@ -24,7 +24,7 @@ data BirbType : Type where
 ||| - `BirbBool` is interpreted as the Idris2 `Bool`.
 ||| - `BirbFun a b` is interpreted as a function type in Idris2, where
 |||    the input has type `a` and the output has type `b`.
-export
+public export
 interpretType : BirbType -> Type
 interpretType BirbInt = Int
 interpretType BirbBool = Bool
@@ -44,6 +44,7 @@ mutual
   ||| An index indicates the number of lambdas between definition and use.
   ||| For example, in the expression `\x. \y. x y` the variable `x` has index 1
   ||| while `y` has 0.
+  public export
   Context : Nat -> Type
   Context n = Vect n BirbType
 
@@ -57,6 +58,7 @@ mutual
   ||| - It takes a [Context], representing the variables available in scope.
   ||| - It takes a `BirbType`, representing the type of the expression itself.
   ||| - It returns an Idris2 type, ensuring type safety at the language level.
+  public export
   data Expression : Context n -> BirbType -> Type where
     ||| A [Value] takes an Idris2 integer and returns an expression
     ||| that evaluates to a [BirbInt].
@@ -123,6 +125,7 @@ mutual
 
   ||| [HasType] is a data type that encodes evidence (or proof) that
   ||| the `i`-th variable in the context is of the provided `BirbType`.
+  public export
   data HasType : Fin n -> Context n -> BirbType -> Type where
     ||| [First] proves that the first variable at index `FZ` (the zeroth index)
     ||| in the context has the provided type `t`.
